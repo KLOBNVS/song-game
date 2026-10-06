@@ -6,24 +6,31 @@
 <title>Whose Song Is It?</title>
 <script>
 /* =====================================================================
-   PART 1 – PUBLIC FILE (GitHub Pages)
-   Contains ONLY YouTube links and start times. No names, photos,
-   titles or artists – those live in Answers_LOCAL_ONLY.html.
-   - link:  YouTube link to the official music video
-   - start: where the 1:30 guessing clip starts, "m:ss"
+   PART 1 – PUBLIC FILE (GitHub Pages). No names or photos in here.
+   link / start: YouTube video and where the 1:30 clip starts ("m:ss")
+   title / artist: only shown on the recap slide at the end
+   The ORDER must match Answers_LOCAL_ONLY.html.
    ===================================================================== */
 const SONGS = [
-  { link: "https://www.youtube.com/watch?v=J36z7AnhvOM", start: "0:00" },
-  { link: "https://www.youtube.com/watch?v=GR3Liudev18", start: "0:10" },
-  { link: "https://www.youtube.com/watch?v=aplWTXEcY70", start: "0:02" },
+  { link: "https://www.youtube.com/watch?v=J36z7AnhvOM", start: "2:06", title: "Can't Take My Eyes Off You", artist: "Frankie Valli and the Four Seasons" },
+  { link: "https://www.youtube.com/watch?v=GR3Liudev18", start: "2:56", title: "Pink Pony Club", artist: "Chappell Roan" },
+  { link: "https://www.youtube.com/watch?v=aplWTXEcY70", start: "0:58", title: "Hallelujah", artist: "Alexandra Burke" },
+  { link: "https://www.youtube.com/watch?v=GkTWxDB21cA", start: "1:07", title: "La Perla", artist: "Rosalía" },
+  { link: "https://www.youtube.com/watch?v=6okxuiiHx2w", start: "0:00", title: "Baby I'm Yours", artist: "Breakbot" },
+  { link: "https://www.youtube.com/watch?v=gnoGvW6o6rk", start: "0:21", title: "Chemistry", artist: "Rush" },
+  { link: "https://www.youtube.com/watch?v=GzZWSrr5wFI", start: "4:14", title: "Where the Streets Have No Name", artist: "U2" },
+  { link: "https://www.youtube.com/watch?v=12EdjfCiPq0", start: "1:15", title: "Dios Es Un Stalker", artist: "Rosalía" },
+  { link: "https://www.youtube.com/watch?v=yaRXdqe_JPQ", start: "1:26", title: "The Voice", artist: "Ultravox" },
+  { link: "https://www.youtube.com/watch?v=oKxuiw3iMBE", start: "2:08", title: "West Coast", artist: "Lana Del Rey" },
+  { link: "https://www.youtube.com/watch?v=OJWJE0x7T4Q", start: "2:20", title: "Sledgehammer", artist: "Peter Gabriel" },
+  { link: "https://www.youtube.com/watch?v=XEEasR7hVhA", start: "0:08", title: "The Devil in I", artist: "Slipknot" },
+  { link: "https://www.youtube.com/watch?v=XKzKZ6iYIYE", start: "1:04", title: "Alle Skuffer Over Tid", artist: "The Minds of 99" },
+  { link: "https://www.youtube.com/watch?v=j2E30cCNRlc", start: "1:11", title: "Stjerneklar", artist: "Pil" },
+  { link: "https://www.youtube.com/watch?v=mGgMZpGYiy8", start: "0:32", title: "Friday I'm in Love", artist: "The Cure" },
+  { link: "https://www.youtube.com/watch?v=4WRJHbL4dAk", start: "0:00", title: "Kala Chashma", artist: "Badshah, Neha Kakkar & Amar Arshi" },
 ];
-
-const SETTINGS = {
-  gameTitle: "Whose Song Is It?",
-  subtitle: "Departmental Seminar 2026",
-  guessClipSeconds: 90,
-  points: "👥 <b>Colleague score:</b> 1 pt per correct colleague<br>🎧 <b>Music score:</b> 1 pt per correct artist + 1 pt per correct title<br><small>Keep the two scores separate – there's a prize for each!</small>",
-};
+const CLIP_SECONDS = 90;   // length of each clip
+const FADE_SECONDS = 5;    // video + sound fade out over the last 5 s
 </script>
 <style>
   :root{--bg1:#1a0b2e;--bg2:#3b0f4f;--gold:#ffcc33;--pink:#ff3d7f;--cyan:#33e1ff;--white:#fff8ec}
@@ -35,45 +42,56 @@ const SETTINGS = {
   .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:3vh 4vw;text-align:center}
   .screen.active{display:flex;animation:fade .5s}
   @keyframes fade{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
-  h1{font-size:7vw;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(255,204,51,.6),4px 4px 0 var(--pink)}
+  h1{font-size:6vw;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(255,204,51,.6),4px 4px 0 var(--pink)}
+  h1.sm{font-size:3.6vw;margin-bottom:2vh}
+  h2{font-size:2.2vw;color:var(--cyan);text-transform:uppercase;letter-spacing:.15em;margin-bottom:1vh}
   .sub{font-size:2vw;opacity:.85;margin-top:1vh}
   .badge{display:inline-block;padding:.5vh 2vw;border:3px solid var(--gold);border-radius:999px;
-    font-weight:800;font-size:1.6vw;color:var(--gold);margin-bottom:2vh;text-transform:uppercase;letter-spacing:.2em}
+    font-weight:800;font-size:1.5vw;color:var(--gold);margin-bottom:2vh;text-transform:uppercase;letter-spacing:.2em}
   .btn{margin-top:3vh;padding:1.6vh 3vw;font-size:1.8vw;font-weight:800;border:none;border-radius:14px;cursor:pointer;
     background:linear-gradient(180deg,var(--gold),#f59e0b);color:#2b1300;box-shadow:0 6px 0 #a35d00;text-transform:uppercase}
   .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #a35d00}
+  .btn.pink{background:linear-gradient(180deg,var(--pink),#c2185b);color:#fff;box-shadow:0 6px 0 #7a0f3a}
   .stage{display:flex;gap:3vw;align-items:center}
-  .frame{position:relative;width:58vw;aspect-ratio:16/9;border:6px solid var(--gold);border-radius:18px;overflow:hidden;
-    box-shadow:0 0 40px rgba(255,204,51,.45);background:#000}
-  .frame iframe,.frame #player1{width:100%;height:100%}
-  /* Transparent shield: blocks mouse hover, which would make YouTube re-show the title */
-  .frame .shield{position:absolute;inset:0;z-index:2}
-  /* Banner covering YouTube's title bar at the top of the video */
-  .frame .titlecover{position:absolute;top:0;left:0;right:0;height:15%;z-index:3;
-    display:flex;align-items:center;justify-content:center;
-    background:linear-gradient(180deg,#1a0b2e 0%,#1a0b2e 82%,rgba(26,11,46,0) 100%);
-    color:var(--gold);font-weight:900;font-size:1.6vw;letter-spacing:.25em;text-transform:uppercase}
   .num{font-size:12vw;font-weight:900;color:var(--gold);line-height:1;text-shadow:4px 4px 0 var(--pink)}
   .timer{font-size:5vw;font-weight:900;font-variant-numeric:tabular-nums;color:var(--cyan);margin-top:1vh}
   .bar{width:100%;height:12px;background:rgba(255,255,255,.15);border-radius:6px;margin-top:1vh;overflow:hidden}
   .bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--cyan),var(--pink));transition:width .25s linear}
   .side{width:22vw}
   .scoring{font-size:1.8vw;margin-top:3vh;padding:2vh 3vw;border:2px dashed var(--cyan);border-radius:14px;line-height:1.5}
+  .hidden{display:none!important}
   .nav{position:fixed;bottom:1.5vh;right:2vw;font-size:1vw;opacity:.45}
+  .confetti{position:fixed;top:-20px;width:12px;height:18px;pointer-events:none;animation:fall linear forwards;z-index:99}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+  .frame{position:relative;width:58vw;aspect-ratio:16/9;border:6px solid var(--gold);border-radius:18px;overflow:hidden;
+    box-shadow:0 0 40px rgba(255,204,51,.45);background:#000}
+  .frame iframe,.frame #player1{width:100%;height:100%}
+  .frame .shield{position:absolute;inset:0;z-index:2}
+  .frame .fader{position:absolute;inset:0;z-index:3;background:#000;opacity:0;pointer-events:none;
+    display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:3vw;font-weight:900;letter-spacing:.2em}
+  .recap{display:grid;grid-template-columns:1fr 1fr;gap:1vh 4vw;width:86vw;text-align:left}
+  .recap div{font-size:1.65vw;padding:.7vh 1vw;border-radius:10px;background:rgba(255,255,255,.06);
+    opacity:0;animation:fade .4s forwards}
+  .recap b{display:inline-block;width:3vw;color:var(--gold);font-size:1.9vw}
+  .recap span{opacity:.75}
+  .podium{display:flex;gap:2vw;align-items:flex-end;margin-top:4vh}
+  .podium div{width:16vw;border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:center;
+    font-size:5vw;font-weight:900;color:#2b1300}
 </style>
 </head>
 <body>
 
 <section class="screen active" id="s-title">
   <div class="badge">🎵 Icebreaker 🎵</div>
-  <h1 id="gameTitle"></h1>
-  <div class="sub" id="subtitle"></div>
-  <div class="scoring">Write down <b>whose favourite song</b> each one is.<br><span id="pointsTxt"></span></div>
+  <h1>Whose Song Is It?</h1>
+  <div class="sub">Departmental Seminar 2026</div>
+  <div class="scoring">Listen to each colleague's favourite song<br>and write down <b>whose</b> you think it is.<br><small>1 point for every correct colleague</small></div>
   <button class="btn" onclick="startPart1()">Let's play ▶</button>
 </section>
 
 <section class="screen" id="s-part1">
-  <div class="badge">Part 1 · Guess whose song</div>
+  <div class="badge">Guess whose song</div>
   <div class="stage">
     <div class="side">
       <div style="font-size:2vw;letter-spacing:.2em">SONG</div>
@@ -86,33 +104,42 @@ const SETTINGS = {
     <div class="frame">
       <div id="player1"></div>
       <div class="shield"></div>
-      <div class="titlecover">🎵 Whose song is it? 🎵</div>
+      <div class="fader" id="fader"><span id="faderTxt"></span></div>
     </div>
   </div>
 </section>
 
-<section class="screen" id="s-swap">
-  <div class="badge">Time's up!</div>
-  <h1>🔄 Swap sheets!</h1>
-  <div class="sub">Pass your answer sheet to the person on your left.<br>Time to mark.</div>
-  <div class="sub" style="margin-top:3vh">Answers coming up next… 🥁</div>
+<section class="screen" id="s-recap">
+  <div class="badge">Recap</div>
+  <h1 class="sm">Here's what you heard</h1>
+  <div class="recap" id="recapList"></div>
+  <button class="btn" onclick="toTiebreak()">Tiebreaker ▶</button>
+</section>
+
+<section class="screen" id="s-tie">
+  <div class="badge">⚖️ Tiebreaker</div>
+  <h1 class="sm">Which songs have the most Spotify streams?</h1>
+  <div class="sub">Write down the <b style="color:var(--gold)">top 3</b> song numbers, <b style="color:var(--gold)">in order</b>.</div>
+  <div class="podium">
+    <div style="height:18vh;background:linear-gradient(180deg,#d9d9d9,#9e9e9e)">2</div>
+    <div style="height:26vh;background:linear-gradient(180deg,var(--gold),#f59e0b)">1</div>
+    <div style="height:12vh;background:linear-gradient(180deg,#e0a26b,#a0602e)">3</div>
+  </div>
+  <div class="sub" style="margin-top:3vh">Most songs in the right position wins the tiebreak.<br>Answers coming up next… 🥁</div>
 </section>
 
 <div class="nav">→ / Space = next · P = pause/play</div>
 
 <script>
-document.getElementById("gameTitle").textContent = SETTINGS.gameTitle;
-document.getElementById("subtitle").textContent = SETTINGS.subtitle;
-document.getElementById("pointsTxt").innerHTML = SETTINGS.points;
-
 const toSec = t => { if(!t) return 0; const p=String(t).split(":").map(Number); return p.length===2?p[0]*60+p[1]:p[0]; };
 const fmt = s => `${Math.floor(s/60)}:${String(Math.max(0,Math.floor(s%60))).padStart(2,"0")}`;
-const vid = url => { const m=url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/); return m?m[1]:url; };
+const vid = url => { const m=String(url).match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/); return m?m[1]:null; };
 const show = id => { document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active")); document.getElementById(id).classList.add("active"); };
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 let p1, ready=false, pending=null, i=0, phase="title", tick;
 
-// YouTube player – clips are queued until the player is ready (prevents crashes)
 const tag=document.createElement("script"); tag.src="https://www.youtube.com/iframe_api"; document.head.appendChild(tag);
 window.onYouTubeIframeAPIReady=function(){
   const vars={controls:0,rel:0,modestbranding:1,playsinline:1,disablekb:1,iv_load_policy:3};
@@ -122,39 +149,55 @@ window.onYouTubeIframeAPIReady=function(){
   }});
 };
 
+function setFade(f){
+  $("fader").style.opacity=f;
+  if(ready) try{ p1.setVolume(Math.round(100*(1-f))); }catch(_){}
+}
+
 function playClip(song){
-  const s=toSec(song.start), e=s+SETTINGS.guessClipSeconds, len=SETTINGS.guessClipSeconds;
-  clearInterval(tick);
+  clearInterval(tick); pending=null;
+  $("faderTxt").textContent=""; $("fader").style.opacity=0;
+  const id=vid(song.link); if(!id) return;
+  const s=toSec(song.start), e=s+CLIP_SECONDS;
   const go=()=>{
-    p1.loadVideoById({videoId:vid(song.link), startSeconds:s, endSeconds:e});
+    setFade(0);
+    p1.loadVideoById({videoId:id, startSeconds:s});
     tick=setInterval(()=>{
       let t=0; try{ t=p1.getCurrentTime(); }catch(_){}
-      const left=Math.min(len,Math.max(0,e-t));
-      if(t>=s-1){ document.getElementById("p1timer").textContent=fmt(Math.ceil(left));
-        document.getElementById("p1bar").style.width=(left/len*100)+"%"; }
-      if(t>=e-0.2){ p1.pauseVideo(); clearInterval(tick); document.getElementById("p1timer").textContent="0:00"; }
-    },250);
+      if(t<s-1) return;
+      const left=Math.min(CLIP_SECONDS,Math.max(0,e-t));
+      $("p1timer").textContent=fmt(Math.ceil(left));
+      $("p1bar").style.width=(left/CLIP_SECONDS*100)+"%";
+      if(left<=FADE_SECONDS) setFade(1-left/FADE_SECONDS);
+      if(left<=0){ clearInterval(tick); p1.pauseVideo(); setFade(1); $("faderTxt").textContent="⏱ TIME'S UP"; }
+    },100);
   };
   if(ready) go(); else pending=go;
 }
 
 function startPart1(){ phase="p1"; i=0; show("s-part1"); playP1(); }
 function playP1(){
-  document.getElementById("p1num").textContent=i+1;
-  document.getElementById("p1of").textContent=`of ${SONGS.length}`;
-  document.getElementById("p1timer").textContent=fmt(SETTINGS.guessClipSeconds);
-  document.getElementById("p1bar").style.width="100%";
-  document.getElementById("p1next").textContent = i===SONGS.length-1 ? "Finish round ▶" : "Next song ▶";
+  $("p1num").textContent=i+1;
+  $("p1of").textContent=`of ${SONGS.length}`;
+  $("p1timer").textContent=fmt(CLIP_SECONDS);
+  $("p1bar").style.width="100%";
+  $("p1next").textContent = i===SONGS.length-1 ? "Finish round ▶" : "Next song ▶";
   playClip(SONGS[i]);
 }
 function nextPart1(){
   if(i<SONGS.length-1){ i++; playP1(); }
-  else { clearInterval(tick); pending=null; if(ready) p1.stopVideo(); phase="swap"; show("s-swap"); }
+  else { clearInterval(tick); pending=null; if(ready) p1.stopVideo(); toRecap(); }
 }
+function toRecap(){
+  phase="recap"; show("s-recap");
+  $("recapList").innerHTML = SONGS.map((s,k)=>
+    `<div style="animation-delay:${k*0.08}s"><b>${k+1}</b>${esc(s.title)} <span>— ${esc(s.artist)}</span></div>`).join("");
+}
+function toTiebreak(){ phase="tie"; show("s-tie"); }
 
 document.addEventListener("keydown",e=>{
   if(["ArrowRight"," ","PageDown","Enter"].includes(e.key)){ e.preventDefault();
-    if(phase==="title") startPart1(); else if(phase==="p1") nextPart1(); }
+    if(phase==="title") startPart1(); else if(phase==="p1") nextPart1(); else if(phase==="recap") toTiebreak(); }
   if(e.key.toLowerCase()==="p" && ready && phase==="p1")
     p1.getPlayerState()===1 ? p1.pauseVideo() : p1.playVideo();
 });
