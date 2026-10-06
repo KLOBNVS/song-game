@@ -7,30 +7,31 @@
 <script>
 /* =====================================================================
    PART 1 – PUBLIC FILE (GitHub Pages). No names or photos in here.
-   link / start: YouTube video and where the 1:30 clip starts ("m:ss")
-   title / artist: only shown on the recap slide at the end
-   The ORDER must match Answers_LOCAL_ONLY.html.
+   Songs are in a fixed RANDOM order – the same order as Answers_LOCAL_ONLY.
+   link / start: YouTube video and where the clip starts ("m:ss")
+   title / artist: only shown on the final recap slide
    ===================================================================== */
 const SONGS = [
-  { link: "https://www.youtube.com/watch?v=J36z7AnhvOM", start: "2:06", title: "Can't Take My Eyes Off You", artist: "Frankie Valli and the Four Seasons" },
-  { link: "https://www.youtube.com/watch?v=GR3Liudev18", start: "2:56", title: "Pink Pony Club", artist: "Chappell Roan" },
-  { link: "https://www.youtube.com/watch?v=aplWTXEcY70", start: "0:58", title: "Hallelujah", artist: "Alexandra Burke" },
-  { link: "https://www.youtube.com/watch?v=GkTWxDB21cA", start: "1:07", title: "La Perla", artist: "Rosalía" },
-  { link: "https://www.youtube.com/watch?v=6okxuiiHx2w", start: "0:00", title: "Baby I'm Yours", artist: "Breakbot" },
-  { link: "https://www.youtube.com/watch?v=gnoGvW6o6rk", start: "0:21", title: "Chemistry", artist: "Rush" },
-  { link: "https://www.youtube.com/watch?v=GzZWSrr5wFI", start: "4:14", title: "Where the Streets Have No Name", artist: "U2" },
-  { link: "https://www.youtube.com/watch?v=12EdjfCiPq0", start: "1:15", title: "Dios Es Un Stalker", artist: "Rosalía" },
-  { link: "https://www.youtube.com/watch?v=yaRXdqe_JPQ", start: "1:26", title: "The Voice", artist: "Ultravox" },
-  { link: "https://www.youtube.com/watch?v=oKxuiw3iMBE", start: "2:08", title: "West Coast", artist: "Lana Del Rey" },
   { link: "https://www.youtube.com/watch?v=OJWJE0x7T4Q", start: "2:20", title: "Sledgehammer", artist: "Peter Gabriel" },
-  { link: "https://www.youtube.com/watch?v=XEEasR7hVhA", start: "0:08", title: "The Devil in I", artist: "Slipknot" },
+  { link: "https://www.youtube.com/watch?v=gnoGvW6o6rk", start: "0:21", title: "Chemistry", artist: "Rush" },
   { link: "https://www.youtube.com/watch?v=XKzKZ6iYIYE", start: "1:04", title: "Alle Skuffer Over Tid", artist: "The Minds of 99" },
-  { link: "https://www.youtube.com/watch?v=j2E30cCNRlc", start: "1:11", title: "Stjerneklar", artist: "Pil" },
+  { link: "https://www.youtube.com/watch?v=oKxuiw3iMBE", start: "2:08", title: "West Coast", artist: "Lana Del Rey" },
   { link: "https://www.youtube.com/watch?v=mGgMZpGYiy8", start: "0:32", title: "Friday I'm in Love", artist: "The Cure" },
+  { link: "https://www.youtube.com/watch?v=GkTWxDB21cA", start: "1:07", title: "La Perla", artist: "Rosalía" },
+  { link: "https://www.youtube.com/watch?v=J36z7AnhvOM", start: "2:06", title: "Can't Take My Eyes Off You", artist: "Frankie Valli and the Four Seasons" },
+  { link: "https://www.youtube.com/watch?v=yaRXdqe_JPQ", start: "1:26", title: "The Voice", artist: "Ultravox" },
+  { link: "https://www.youtube.com/watch?v=j2E30cCNRlc", start: "1:11", title: "Stjerneklar", artist: "Pil" },
+  { link: "https://www.youtube.com/watch?v=aplWTXEcY70", start: "0:58", title: "Hallelujah", artist: "Alexandra Burke" },
   { link: "https://www.youtube.com/watch?v=4WRJHbL4dAk", start: "0:00", title: "Kala Chashma", artist: "Badshah, Neha Kakkar & Amar Arshi" },
+  { link: "https://www.youtube.com/watch?v=GzZWSrr5wFI", start: "4:14", title: "Where the Streets Have No Name", artist: "U2" },
+  { link: "https://www.youtube.com/watch?v=XEEasR7hVhA", start: "0:08", title: "The Devil in I", artist: "Slipknot" },
+  { link: "https://www.youtube.com/watch?v=GR3Liudev18", start: "2:56", title: "Pink Pony Club", artist: "Chappell Roan" },
+  { link: "https://www.youtube.com/watch?v=6okxuiiHx2w", start: "0:00", title: "Baby I'm Yours", artist: "Breakbot" },
+  { link: "https://www.youtube.com/watch?v=12EdjfCiPq0", start: "1:15", title: "Dios Es Un Stalker (Versión Francotiradora)", artist: "Rosalía" },
 ];
-const CLIP_SECONDS = 90;   // length of each clip
-const FADE_SECONDS = 5;    // video + sound fade out over the last 5 s
+const CLIP_SECONDS = 60;     // play time per song
+const FADE_IN_SECONDS = 2;   // video + sound fade in at the start
+const FADE_OUT_SECONDS = 5;  // video + sound fade out at the end
 </script>
 <style>
   :root{--bg1:#1a0b2e;--bg2:#3b0f4f;--gold:#ffcc33;--pink:#ff3d7f;--cyan:#33e1ff;--white:#fff8ec}
@@ -42,8 +43,9 @@ const FADE_SECONDS = 5;    // video + sound fade out over the last 5 s
   .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:3vh 4vw;text-align:center}
   .screen.active{display:flex;animation:fade .5s}
   @keyframes fade{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+  @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
   h1{font-size:6vw;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(255,204,51,.6),4px 4px 0 var(--pink)}
-  h1.sm{font-size:3.6vw;margin-bottom:2vh}
+  h1.sm{font-size:3.4vw;margin-bottom:1.5vh}
   h2{font-size:2.2vw;color:var(--cyan);text-transform:uppercase;letter-spacing:.15em;margin-bottom:1vh}
   .sub{font-size:2vw;opacity:.85;margin-top:1vh}
   .badge{display:inline-block;padding:.5vh 2vw;border:3px solid var(--gold);border-radius:999px;
@@ -68,16 +70,22 @@ const FADE_SECONDS = 5;    // video + sound fade out over the last 5 s
     box-shadow:0 0 40px rgba(255,204,51,.45);background:#000}
   .frame iframe,.frame #player1{width:100%;height:100%}
   .frame .shield{position:absolute;inset:0;z-index:2}
-  .frame .fader{position:absolute;inset:0;z-index:3;background:#000;opacity:0;pointer-events:none;
+  .frame .fader{position:absolute;inset:0;z-index:3;background:#000;opacity:1;pointer-events:none;
     display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:3vw;font-weight:900;letter-spacing:.2em}
-  .recap{display:grid;grid-template-columns:1fr 1fr;gap:1vh 4vw;width:86vw;text-align:left}
-  .recap div{font-size:1.65vw;padding:.7vh 1vw;border-radius:10px;background:rgba(255,255,255,.06);
-    opacity:0;animation:fade .4s forwards}
-  .recap b{display:inline-block;width:3vw;color:var(--gold);font-size:1.9vw}
-  .recap span{opacity:.75}
-  .podium{display:flex;gap:2vw;align-items:flex-end;margin-top:4vh}
-  .podium div{width:16vw;border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:center;
-    font-size:5vw;font-weight:900;color:#2b1300}
+  #s-final{justify-content:flex-start;padding-top:3vh}
+  .final{display:flex;gap:3vw;width:94vw;align-items:stretch;margin-top:1vh}
+  .recap{flex:1.6;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:.9vh 1.5vw;text-align:left}
+  .recap>div{font-size:1.35vw;padding:.6vh .9vw;border-radius:10px;background:rgba(255,255,255,.06);
+    display:flex;align-items:center;opacity:0;animation:fade .4s forwards;line-height:1.2}
+  .recap b{flex:0 0 2.6vw;color:var(--gold);font-size:1.7vw}
+  .recap span{opacity:.7}
+  .tie{flex:1;border:3px solid var(--gold);border-radius:20px;padding:2.5vh 2vw;background:rgba(0,0,0,.2);
+    display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .tie .q{font-size:2.1vw;font-weight:900;color:var(--gold);line-height:1.25}
+  .tie .i{font-size:1.4vw;opacity:.9;margin-top:1.5vh}
+  .podium{display:flex;gap:1.2vw;align-items:flex-end;margin-top:3vh}
+  .podium div{width:7.5vw;border-radius:12px 12px 0 0;display:flex;align-items:flex-start;justify-content:center;
+    padding-top:1vh;font-size:3vw;font-weight:900;color:#2b1300}
 </style>
 </head>
 <body>
@@ -97,7 +105,7 @@ const FADE_SECONDS = 5;    // video + sound fade out over the last 5 s
       <div style="font-size:2vw;letter-spacing:.2em">SONG</div>
       <div class="num" id="p1num">1</div>
       <div style="font-size:1.6vw;opacity:.8" id="p1of"></div>
-      <div class="timer" id="p1timer">1:30</div>
+      <div class="timer" id="p1timer">1:00</div>
       <div class="bar"><i id="p1bar"></i></div>
       <button class="btn" onclick="nextPart1()" id="p1next">Next song ▶</button>
     </div>
@@ -109,23 +117,22 @@ const FADE_SECONDS = 5;    // video + sound fade out over the last 5 s
   </div>
 </section>
 
-<section class="screen" id="s-recap">
-  <div class="badge">Recap</div>
+<section class="screen" id="s-final">
   <h1 class="sm">Here's what you heard</h1>
-  <div class="recap" id="recapList"></div>
-  <button class="btn" onclick="toTiebreak()">Tiebreaker ▶</button>
-</section>
-
-<section class="screen" id="s-tie">
-  <div class="badge">⚖️ Tiebreaker</div>
-  <h1 class="sm">Which songs have the most Spotify streams?</h1>
-  <div class="sub">Write down the <b style="color:var(--gold)">top 3</b> song numbers, <b style="color:var(--gold)">in order</b>.</div>
-  <div class="podium">
-    <div style="height:18vh;background:linear-gradient(180deg,#d9d9d9,#9e9e9e)">2</div>
-    <div style="height:26vh;background:linear-gradient(180deg,var(--gold),#f59e0b)">1</div>
-    <div style="height:12vh;background:linear-gradient(180deg,#e0a26b,#a0602e)">3</div>
+  <div class="final">
+    <div class="recap" id="recapList"></div>
+    <div class="tie">
+      <div class="badge" style="margin-bottom:1.5vh">⚖️ Tiebreaker</div>
+      <div class="q">Which 3 songs have the most Spotify streams?</div>
+      <div class="i">Write down the <b>song numbers</b>, <b>in order</b> from 1st to 3rd.</div>
+      <div class="podium">
+        <div style="height:13vh;background:linear-gradient(180deg,#d9d9d9,#9e9e9e)">2</div>
+        <div style="height:19vh;background:linear-gradient(180deg,var(--gold),#f59e0b)">1</div>
+        <div style="height:9vh;background:linear-gradient(180deg,#e0a26b,#a0602e)">3</div>
+      </div>
+      <div class="i" style="font-size:1.15vw;opacity:.7">Most songs in the right position wins the tiebreak</div>
+    </div>
   </div>
-  <div class="sub" style="margin-top:3vh">Most songs in the right position wins the tiebreak.<br>Answers coming up next… 🥁</div>
 </section>
 
 <div class="nav">→ / Space = next · P = pause/play</div>
@@ -149,6 +156,7 @@ window.onYouTubeIframeAPIReady=function(){
   }});
 };
 
+// f: 0 = fully visible + full volume, 1 = black + silent
 function setFade(f){
   $("fader").style.opacity=f;
   if(ready) try{ p1.setVolume(Math.round(100*(1-f))); }catch(_){}
@@ -156,21 +164,24 @@ function setFade(f){
 
 function playClip(song){
   clearInterval(tick); pending=null;
-  $("faderTxt").textContent=""; $("fader").style.opacity=0;
+  $("faderTxt").textContent=""; $("fader").style.opacity=1;
   const id=vid(song.link); if(!id) return;
   const s=toSec(song.start), e=s+CLIP_SECONDS;
   const go=()=>{
-    setFade(0);
+    setFade(1);                                   // start black + silent
     p1.loadVideoById({videoId:id, startSeconds:s});
     tick=setInterval(()=>{
       let t=0; try{ t=p1.getCurrentTime(); }catch(_){}
-      if(t<s-1) return;
-      const left=Math.min(CLIP_SECONDS,Math.max(0,e-t));
+      if(t<s-0.5 || p1.getPlayerState()!==1) return;   // wait until it's really playing
+      const elapsed=t-s, left=Math.min(CLIP_SECONDS,Math.max(0,e-t));
       $("p1timer").textContent=fmt(Math.ceil(left));
       $("p1bar").style.width=(left/CLIP_SECONDS*100)+"%";
-      if(left<=FADE_SECONDS) setFade(1-left/FADE_SECONDS);
+      let f=0;
+      if(elapsed<FADE_IN_SECONDS) f=1-Math.max(0,elapsed)/FADE_IN_SECONDS;     // fade in
+      if(left<=FADE_OUT_SECONDS) f=Math.max(f,1-left/FADE_OUT_SECONDS);       // fade out
+      setFade(f);
       if(left<=0){ clearInterval(tick); p1.pauseVideo(); setFade(1); $("faderTxt").textContent="⏱ TIME'S UP"; }
-    },100);
+    },50);
   };
   if(ready) go(); else pending=go;
 }
@@ -186,18 +197,17 @@ function playP1(){
 }
 function nextPart1(){
   if(i<SONGS.length-1){ i++; playP1(); }
-  else { clearInterval(tick); pending=null; if(ready) p1.stopVideo(); toRecap(); }
+  else { clearInterval(tick); pending=null; if(ready) p1.stopVideo(); toFinal(); }
 }
-function toRecap(){
-  phase="recap"; show("s-recap");
+function toFinal(){
+  phase="final"; show("s-final");
   $("recapList").innerHTML = SONGS.map((s,k)=>
-    `<div style="animation-delay:${k*0.08}s"><b>${k+1}</b>${esc(s.title)} <span>— ${esc(s.artist)}</span></div>`).join("");
+    `<div style="animation-delay:${k*0.07}s"><b>${k+1}</b><div>${esc(s.title)} <span>— ${esc(s.artist)}</span></div></div>`).join("");
 }
-function toTiebreak(){ phase="tie"; show("s-tie"); }
 
 document.addEventListener("keydown",e=>{
   if(["ArrowRight"," ","PageDown","Enter"].includes(e.key)){ e.preventDefault();
-    if(phase==="title") startPart1(); else if(phase==="p1") nextPart1(); else if(phase==="recap") toTiebreak(); }
+    if(phase==="title") startPart1(); else if(phase==="p1") nextPart1(); }
   if(e.key.toLowerCase()==="p" && ready && phase==="p1")
     p1.getPlayerState()===1 ? p1.pauseVideo() : p1.playVideo();
 });
