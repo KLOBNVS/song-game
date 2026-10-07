@@ -62,8 +62,16 @@ const FADE_OUT_SECONDS = 5;  // video + sound fade out at the end
     box-shadow:0 0 40px rgba(255,204,51,.45);background:#000}
   .frame iframe,.frame #player1{width:100%;height:100%}
   .frame .shield{position:absolute;inset:0;z-index:2}
+  /* Curtain: covers the player (and any advert) until the song itself is playing */
+  .frame .curtain{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vh;
+    background:radial-gradient(circle at 50% 45%,var(--bg2),var(--bg1) 75%)}
+  .frame .curtain .big{font-size:3.2vw;font-weight:900;color:var(--gold);text-shadow:3px 3px 0 var(--pink)}
+  .frame .curtain .eq{display:flex;gap:.5vw;align-items:flex-end;height:6vh}
+  .frame .curtain .eq i{width:.8vw;background:linear-gradient(0deg,var(--cyan),var(--pink));border-radius:3px;animation:eq 1s ease-in-out infinite}
+  @keyframes eq{0%,100%{height:15%}50%{height:100%}}
   .frame .fader{position:absolute;inset:0;z-index:3;background:#000;opacity:0;pointer-events:none;
     display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:3vw;font-weight:900;letter-spacing:.2em}
+  .hidden{display:none!important}
   #s-final{justify-content:flex-start;padding-top:3vh}
   .final{display:flex;gap:3vw;width:94vw;align-items:stretch;margin-top:1vh}
   .recap{flex:1.6;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:.9vh 1.5vw;text-align:left}
@@ -105,6 +113,11 @@ const FADE_OUT_SECONDS = 5;  // video + sound fade out at the end
       <div id="player1"></div>
       <div class="shield"></div>
       <div class="fader" id="fader"><span id="faderTxt"></span></div>
+      <div class="curtain" id="curtain">
+        <div class="big" id="curtainTxt">Song 1</div>
+        <div class="eq"><i></i><i style="animation-delay:.2s"></i><i style="animation-delay:.4s"></i><i style="animation-delay:.1s"></i><i style="animation-delay:.3s"></i></div>
+        <div style="font-size:1.4vw;opacity:.8">🎧 Get ready…</div>
+      </div>
     </div>
   </div>
 </section>
@@ -148,32 +161,39 @@ window.onYouTubeIframeAPIReady=function(){
   }});
 };
 
-// f: 0 = fully visible + full volume, 1 = black + silent (used for the fade-out only)
-function setFade(f){
-  $("fader").style.opacity=f;
-  if(ready) try{ p1.setVolume(Math.round(100*(1-f))); }catch(_){}
-}
+const vol = v => { if(ready) try{ p1.setVolume(v); }catch(_){} };
+function setFade(f){ $("fader").style.opacity=f; vol(Math.round(100*(1-f))); }
+function curtain(on){ $("curtain").classList.toggle("hidden",!on); }
 
 function playClip(song){
   clearInterval(tick); pending=null;
   $("faderTxt").textContent=""; $("fader").style.opacity=0;
+  $("curtainTxt").textContent=`Song ${i+1}`; curtain(true);
   const id=vid(song.link); if(!id) return;
   const s=toSec(song.start);
   const go=()=>{
-    setFade(0);                                   // video visible + full volume straight away
+    vol(0);                                        // silent while the curtain is up
     p1.loadVideoById({videoId:id, startSeconds:s});
-    // 60 s stopwatch that only runs while the video is actually playing
-    let played=0, last=null;
+    let lastT=null, live=false, played=0, last=null;
     tick=setInterval(()=>{
-      let state=-1; try{ state=p1.getPlayerState(); }catch(_){}
+      let state=-1, t=0; try{ state=p1.getPlayerState(); t=p1.getCurrentTime(); }catch(_){}
       const now=performance.now();
+      if(!live){
+        // The song counts as "live" once it is playing near the chosen start AND its
+        // own clock is moving. While YouTube shows an advert, the song's clock stays
+        // still, so the curtain stays up and the ad is hidden and muted.
+        const moving = lastT!==null && t>lastT+0.05;
+        lastT=t;
+        if(state===1 && t>=s-1 && moving){ live=true; curtain(false); vol(100); last=now; }
+        return;
+      }
       if(state!==1){ last=null; return; }
       if(last!==null) played+=(now-last)/1000;
       last=now;
       const left=Math.max(0,CLIP_SECONDS-played);
       $("p1timer").textContent=fmt(Math.ceil(left));
       $("p1bar").style.width=(left/CLIP_SECONDS*100)+"%";
-      if(left<=FADE_OUT_SECONDS) setFade(1-left/FADE_OUT_SECONDS);     // fade out at the end
+      if(left<=FADE_OUT_SECONDS) setFade(1-left/FADE_OUT_SECONDS);
       if(left<=0){ clearInterval(tick); p1.pauseVideo(); setFade(1); $("faderTxt").textContent="⏱ TIME'S UP"; }
     },100);
   };
